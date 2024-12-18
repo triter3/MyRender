@@ -34,25 +34,25 @@ target_include_directories(${PROJECT_NAME} PUBLIC include/)
 target_include_directories(${PROJECT_NAME} PRIVATE src/)
 
 # Add shaders
-file(GLOB SHADER_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src/render_engine/shaders 
-                       src/render_engine/shaders/*.frag 
-                       src/render_engine/shaders/*.vert
-                       src/render_engine/shaders/*.comp)
+# file(GLOB SHADER_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src/render_engine/shaders 
+#                        src/render_engine/shaders/*.frag 
+#                        src/render_engine/shaders/*.vert
+#                        src/render_engine/shaders/*.comp)
 
-foreach(SHADER IN LISTS SHADER_FILES)
-    add_custom_command(OUTPUT ${SHADER}
-            COMMAND cmake -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/src/render_engine/shaders/${SHADER} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/${SHADER}
-            DEPENDS src/render_engine/shaders/${SHADER}
-        )
-endforeach()
+# foreach(SHADER IN LISTS SHADER_FILES)
+#     add_custom_command(OUTPUT ${SHADER}
+#             COMMAND cmake -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/src/render_engine/shaders/${SHADER} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/${SHADER}
+#             DEPENDS src/render_engine/shaders/${SHADER}
+#         )
+# endforeach()
 
-add_custom_target(copyShaders ALL SOURCES ${SHADER_FILES})
+# add_custom_target(copyShaders ALL SOURCES ${SHADER_FILES})
 
 # Add dependencies
 add_subdirectory(libs)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC glm slang glfw imgui imguizmo glad stb_image)
-add_dependencies(${PROJECT_NAME} copyShaders)
+# add_dependencies(${PROJECT_NAME} copyShaders)
 
 if(MYRENDER_BUILD_EXAMPLES)
     add_subdirectory(examples)
