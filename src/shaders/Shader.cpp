@@ -1,11 +1,11 @@
-#include "shaders/Shader.h"
+#include "MyRender/shaders/Shader.h"
 #include <iostream>
 #include <map>
 #include <glm/gtc/matrix_inverse.hpp>
-#include "shaders/ShaderProgramLoader.h"
-#include "Camera.h"
+#include "MyRender/shaders/ShaderProgramLoader.h"
+#include "MyRender/Camera.h"
 
-namespace MyRender
+namespace myrender
 {
 
 namespace internal

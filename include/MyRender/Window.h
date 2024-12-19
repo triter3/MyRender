@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <vector>
 
-namespace MyRender
+namespace myrender
 {
 
 class Window {

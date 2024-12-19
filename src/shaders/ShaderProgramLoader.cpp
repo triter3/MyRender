@@ -1,6 +1,6 @@
-#include "shaders/ShaderProgramLoader.h"
+#include "MyRender/shaders/ShaderProgramLoader.h"
 
-namespace MyRender
+namespace myrender
 {
 
 std::shared_ptr<ShaderProgram> ShaderProgramLoader::loadProgram(const std::string& name)

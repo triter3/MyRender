@@ -1,7 +1,7 @@
-#include "Scene.h"
+#include "MyRender/Scene.h"
 #include <imgui.h>
 
-namespace MyRender
+namespace myrender
 {
 
 void Scene::update(float deltaTime)

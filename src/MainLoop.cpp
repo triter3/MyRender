@@ -1,14 +1,14 @@
-#include "MainLoop.h"
+#include "MyRender/MainLoop.h"
 
 #include <thread>
-#include "Window.h"
-#include "utils/Timer.h"
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <ImGuizmo.h>
+#include "MyRender/Window.h"
+#include "MyRender/utils/Timer.h"
 
-namespace MyRender
+namespace myrender
 {
 
 void MainLoop::start(Scene& scene)
@@ -16,10 +16,10 @@ void MainLoop::start(Scene& scene)
     Window window;
     window.start();
 
-    sdflib::Timer deltaTimer;
+    Timer deltaTimer;
 	deltaTimer.start();
 
-	sdflib::Timer fpsTimer;
+	Timer fpsTimer;
 	fpsTimer.start();
 
 	Window::setCurrentWindow(&window);

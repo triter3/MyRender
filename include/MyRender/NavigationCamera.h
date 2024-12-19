@@ -1,9 +1,9 @@
 #ifndef NAVEGATION_CAMERA_H
 #define NAVEGATION_CAMERA_H
 
-#include "Camera.h"
+#include "MyRender/Camera.h"
 
-namespace MyRender
+namespace myrender
 {
 
 class NavigationCamera : public Camera

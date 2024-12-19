@@ -7,10 +7,10 @@
 #include <vector>
 #include <functional>
 #include <optional>
-#include "Camera.h"
-#include "System.h"
+#include "MyRender/Camera.h"
+#include "MyRender/System.h"
 
-namespace MyRender
+namespace myrender
 {
 
 class Scene 

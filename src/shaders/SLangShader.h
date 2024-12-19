@@ -11,7 +11,7 @@
 #include "slang.h"
 #include "slang-com-ptr.h"
 
-namespace MyRender
+namespace myrender
 {
 
 const std::string SHADER_PATH = "./shaders/";

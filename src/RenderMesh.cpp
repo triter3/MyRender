@@ -1,10 +1,10 @@
 
-#include "RenderMesh.h"
+#include "MyRender/RenderMesh.h"
 #include <iostream>
 #include <imgui.h>
-#include "Camera.h"
+#include "MyRender/Camera.h"
 
-namespace MyRender
+namespace myrender
 {
 
 void RenderMesh::setMeshData(Mesh& mesh)

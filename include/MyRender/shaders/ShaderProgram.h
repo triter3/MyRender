@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
-namespace MyRender
+namespace myrender
 {
 
 class ShaderProgram 

@@ -5,6 +5,9 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+namespace myrender
+{
+
 struct BoundingBox
 {
     BoundingBox() : min(INFINITY), max(-INFINITY) {}
@@ -59,5 +62,7 @@ private:
     std::vector<glm::vec3> mNormals;
     BoundingBox mBBox;
 };
+
+}
 
 #endif

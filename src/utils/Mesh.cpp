@@ -1,6 +1,9 @@
 #include <iostream>
 #include <assert.h>
-#include <utils/Mesh.h>
+#include <MyRender/utils/Mesh.h>
+
+namespace myrender
+{
 
 Mesh::Mesh(glm::vec3* vertices, uint32_t numVertices,
            uint32_t* indices, uint32_t numIndices)
@@ -61,4 +64,6 @@ void Mesh::applyTransform(glm::mat4 trans)
     }
 
     computeBoundingBox();
+}
+
 }

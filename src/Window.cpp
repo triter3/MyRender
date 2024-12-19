@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "MyRender/Window.h"
 #include <iostream>
 #include <set>
 #include <algorithm>
@@ -6,7 +6,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-namespace MyRender
+namespace myrender
 {
 
 Window* Window::mCurrentWindow = nullptr;

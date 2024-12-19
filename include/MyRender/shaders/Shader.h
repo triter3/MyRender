@@ -3,10 +3,10 @@
 
 #include <string>
 #include <map>
-#include "ShaderProgram.h"
-#include "Camera.h"
+#include "MyRender/shaders/ShaderProgram.h"
+#include "MyRender/Camera.h"
 
-namespace MyRender
+namespace myrender
 {
 	
 class Texture

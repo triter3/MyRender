@@ -6,9 +6,9 @@
 #include <map>
 #include <memory>
 
-#include "ShaderProgram.h"
+#include "MyRender/shaders/ShaderProgram.h"
 
-namespace MyRender
+namespace myrender
 {
 
 class ShaderProgramLoader

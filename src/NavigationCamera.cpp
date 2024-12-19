@@ -1,10 +1,10 @@
-#include "NavigationCamera.h"
-#include "Window.h"
+#include "MyRender/NavigationCamera.h"
+#include "MyRender/Window.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <imgui.h>
 
-namespace MyRender
+namespace myrender
 {
 
 void NavigationCamera::update(float deltaTime)

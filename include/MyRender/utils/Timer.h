@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-namespace sdflib
+namespace myrender
 {
 class Timer {
 public:

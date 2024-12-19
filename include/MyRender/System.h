@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace MyRender
+namespace myrender
 {
 
 class Camera;

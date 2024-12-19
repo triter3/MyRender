@@ -1,5 +1,3 @@
-#include "shaders/ShaderProgram.h"
-#include "shaders/ShaderProgramLoader.h"
 #include <iostream>
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,8 +6,10 @@
 #include <functional>
 #include <map>
 #include <regex>
+#include "MyRender/shaders/ShaderProgram.h"
+#include "MyRender/shaders/ShaderProgramLoader.h"
 
-namespace MyRender
+namespace myrender
 {
 
 ShaderProgram::ShaderProgram(const std::string& shaderName)
@@ -30,6 +30,7 @@ ShaderProgram::ShaderProgram(const std::string& shaderName)
 	std::function<void(const std::filesystem::path&)> searchShaders;
 	searchShaders = [&](const std::filesystem::path& path)
 	{
+		if(!std::filesystem::is_directory(path)) return;
 		auto pitr = std::filesystem::directory_iterator(path);
 		for(std::filesystem::directory_entry entry : pitr)
 		{

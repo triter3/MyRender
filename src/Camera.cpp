@@ -1,7 +1,7 @@
-#include "Camera.h"
+#include "MyRender/Camera.h"
 #include <imgui.h>
 
-namespace MyRender
+namespace myrender
 {
 
 void Camera::start()

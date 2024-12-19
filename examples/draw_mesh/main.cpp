@@ -1,16 +1,14 @@
 #include <iostream>
 #include <array>
-#include "Scene.h"
-#include "MainLoop.h"
-#include "slang.h"
-#include "slang-com-ptr.h"
-#include "RenderMesh.h"
-#include "utils/PrimitivesFactory.h"
-#include "shaders/Shader.h"
-#include "NavigationCamera.h"
-#include "Window.h"
+#include "MyRender/Scene.h"
+#include "MyRender/MainLoop.h"
+#include "MyRender/RenderMesh.h"
+#include "MyRender/utils/PrimitivesFactory.h"
+#include "MyRender/shaders/Shader.h"
+#include "MyRender/NavigationCamera.h"
+#include "MyRender/Window.h"
 
-using namespace MyRender;
+using namespace myrender;
 
 int main()
 {
@@ -23,7 +21,7 @@ int main()
         myCube->computeNormals();
         auto mesh = s.createSystem<RenderMesh>();
         mesh->setMeshData(*myCube);
-        mesh->setShader(Shader::loadShader("LightRender"));
+        mesh->setShader(Shader::loadShader("LightRender12"));
         std::vector<float> v = { 0.0f };
         mesh->getShader().setBufferData("mydata", v);
         mesh->systemName = "My Mesh";

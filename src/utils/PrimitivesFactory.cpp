@@ -1,7 +1,10 @@
-#include "utils/PrimitivesFactory.h"
+#include "MyRender/utils/PrimitivesFactory.h"
 
 #include <map>
 #include <array>
+
+namespace myrender
+{
 
 namespace PrimitivesFactory
 {
@@ -192,4 +195,6 @@ std::shared_ptr<Mesh> getCube()
 
     return mesh;
 }
+}
+
 }

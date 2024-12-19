@@ -3,11 +3,11 @@
 
 #include <glad/glad.h>
 #include <vector>
-#include "System.h"
-#include "shaders/Shader.h"
-#include "utils/Mesh.h"
+#include "MyRender/System.h"
+#include "MyRender/shaders/Shader.h"
+#include "MyRender/utils/Mesh.h"
 
-namespace MyRender
+namespace myrender
 {
 
 class RenderMesh : public System
