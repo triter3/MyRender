@@ -121,7 +121,7 @@ std::optional<std::filesystem::path> ShaderProgram::getModulePath(const std::str
 				auto p = searchModule(entry.path());
 				if(p) return p;
 			}
-			else if(entry.is_regular_file() && entry.path().filename() == moduleName && entry.path().extension() == "glsl")
+			else if(entry.is_regular_file() && entry.path().filename().stem() == moduleName && entry.path().extension() == ".glsl")
 			{
 				return entry.path();
 			}
@@ -147,7 +147,7 @@ ShaderProgram::~ShaderProgram()
 std::optional<uint32_t> ShaderProgram::loadShader(const std::string& shaderPath, GLenum shaderType)
 {
 	std::vector<char*> shaderFile;
-	std::regex regex("(#include ([a-zA-z0-9]+)([ ]*)\n)");
+	std::regex regex("(#include ([a-zA-z0-9]+)([ ]*)(\r?)\n)");
 	std::match_results<const char*> m;
 
 	std::function<bool(const std::string&)> loadFile;
@@ -167,7 +167,7 @@ std::optional<uint32_t> ShaderProgram::loadShader(const std::string& shaderPath,
 		bool res = true;
 		while(res && std::regex_search(regexStartPoint, m, regex))
 		{
-			*(shaderTxt + static_cast<size_t>(m[0].second - shaderTxt - 2)) = '\0';
+			*(shaderTxt + static_cast<size_t>(m[0].first - shaderTxt)) = '\0';
 			shaderPtr = shaderTxt + static_cast<size_t>(m[0].second - shaderTxt - 1);
 			regexStartPoint = m[0].second;
 
@@ -193,7 +193,7 @@ std::optional<uint32_t> ShaderProgram::loadShader(const std::string& shaderPath,
 	}
 
 	unsigned int shaderId = glCreateShader(shaderType);
-	glShaderSource(shaderId, 1, shaderFile.data(), NULL);
+	glShaderSource(shaderId, shaderFile.size(), shaderFile.data(), NULL);
 	glCompileShader(shaderId);
 
 	int success;

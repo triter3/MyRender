@@ -21,7 +21,7 @@ int main()
         myCube->computeNormals();
         auto mesh = s.createSystem<RenderMesh>();
         mesh->setMeshData(*myCube);
-        mesh->setShader(Shader::loadShader("LightRender12"));
+        mesh->setShader(Shader::loadShader("LightRender"));
         std::vector<float> v = { 0.0f };
         mesh->getShader().setBufferData("mydata", v);
         mesh->systemName = "My Mesh";
