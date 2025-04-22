@@ -47,10 +47,8 @@ void RenderMesh::draw(Camera* camera)
 	if (mPrintSurface) {
 		if(mShader == nullptr)
 		{
-			std::cout << "create" << std::endl;
 			mShader = std::make_unique<Shader>();
 			mShader->load("BasicRender");
-			std::cout << "end create" << std::endl;
 		}
 		mShader->bind(camera, &mTransform);
 

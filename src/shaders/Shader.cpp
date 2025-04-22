@@ -119,39 +119,43 @@ bool Shader::load(const std::string& shaderName)
     // Load all SSBOs
     GLint numBuffers = 0;
     glGetProgramInterfaceiv(pId, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBuffers);
-    for(uint32_t bId = 0; bId < numBuffers; bId++)
+    for(uint32_t bufferType : {GL_SHADER_STORAGE_BLOCK, GL_UNIFORM_BUFFER})
     {
-        ShaderBuffer sb;
-        sb.bufferLocation = std::optional<uint32_t>();
-
-        // Get name
-        GLint nameLength = 0;
-        glGetProgramResourceName(pId, GL_SHADER_STORAGE_BLOCK, bId, 255, &nameLength, nameBuffer);
-        std::string bufferName(nameBuffer, nameLength);
-
-        // Get binding
-        const GLenum bufferBindingArray[1] = {GL_BUFFER_BINDING};
-        glGetProgramResourceiv(pId, GL_SHADER_STORAGE_BLOCK, bId, 1, bufferBindingArray, 1, NULL, reinterpret_cast<GLint*>(&sb.bindingIndex));
-
-        // Iterate buffer variables
-        GLint numActiveBuffers = 0;
-        const GLenum numActiveBufferArray[1] = {GL_NUM_ACTIVE_VARIABLES};
-        glGetProgramResourceiv(pId, GL_SHADER_STORAGE_BLOCK, bId, 1, numActiveBufferArray, 1, NULL, &numActiveBuffers);
-
-        const GLenum activeBufferArray[1] = {GL_ACTIVE_VARIABLES};
-        std::vector<GLint> blockVarId(numActiveBuffers);
-        glGetProgramResourceiv(pId, GL_SHADER_STORAGE_BLOCK, bId, 1, activeBufferArray, numActiveBuffers, NULL, &blockVarId[0]);
-        sb.variables.resize(numActiveBuffers);
-        for(uint32_t i=0; i < numActiveBuffers; i++)
+        for(uint32_t bId = 0; bId < numBuffers; bId++)
         {
-            const GLenum varPropsArray[4] = {GL_OFFSET, GL_TYPE, GL_ARRAY_SIZE, GL_ARRAY_STRIDE};
-            GLint props[4];
-            glGetProgramResourceiv(pId, GL_BUFFER_VARIABLE, blockVarId[i], 4, varPropsArray, 4, NULL, props);
-            auto tIt = internal::uniformTypes.find(static_cast<uint32_t>(props[1]));
-            sb.variables[i] = ShaderBufferVariable{static_cast<uint32_t>(props[0]), tIt->second,
-                                                   static_cast<uint32_t>(props[2]), static_cast<uint32_t>(props[3])};
+            ShaderBuffer sb;
+            sb.bufferType = bufferType;
+            sb.bufferLocation = std::optional<uint32_t>();
+
+            // Get name
+            GLint nameLength = 0;
+            glGetProgramResourceName(pId, sb.bufferType, bId, 255, &nameLength, nameBuffer);
+            std::string bufferName(nameBuffer, nameLength);
+
+            // Get binding
+            const GLenum bufferBindingArray[1] = {GL_BUFFER_BINDING};
+            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, bufferBindingArray, 1, NULL, reinterpret_cast<GLint*>(&sb.bindingIndex));
+
+            // Iterate buffer variables
+            GLint numActiveBuffers = 0;
+            const GLenum numActiveBufferArray[1] = {GL_NUM_ACTIVE_VARIABLES};
+            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, numActiveBufferArray, 1, NULL, &numActiveBuffers);
+
+            const GLenum activeBufferArray[1] = {GL_ACTIVE_VARIABLES};
+            std::vector<GLint> blockVarId(numActiveBuffers);
+            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, activeBufferArray, numActiveBuffers, NULL, &blockVarId[0]);
+            sb.variables.resize(numActiveBuffers);
+            for(uint32_t i=0; i < numActiveBuffers; i++)
+            {
+                const GLenum varPropsArray[4] = {GL_OFFSET, GL_TYPE, GL_ARRAY_SIZE, GL_ARRAY_STRIDE};
+                GLint props[4];
+                glGetProgramResourceiv(pId, GL_BUFFER_VARIABLE, blockVarId[i], 4, varPropsArray, 4, NULL, props);
+                auto tIt = internal::uniformTypes.find(static_cast<uint32_t>(props[1]));
+                sb.variables[i] = ShaderBufferVariable{static_cast<uint32_t>(props[0]), tIt->second,
+                                                    static_cast<uint32_t>(props[2]), static_cast<uint32_t>(props[3])};
+            }
+            mBuffersInfo.emplace(std::make_pair(std::move(bufferName), std::move(sb)));
         }
-        mBuffersInfo.emplace(std::make_pair(std::move(bufferName), std::move(sb)));
     }
 
     mValid = true;

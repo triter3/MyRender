@@ -16,7 +16,7 @@ namespace myrender
 class Scene 
 {
 public:
-	Scene();
+	Scene() {}
 	Scene(std::function<void(Scene&)> startFunc) : startFunc(startFunc) {}
 	virtual void start() 
 	{
@@ -50,6 +50,12 @@ public:
 		std::shared_ptr<T> sp = std::make_shared<T>(args...);
 		addSystem(sp);
 		return sp;
+	}
+
+	void clearScene()
+	{
+		mainCamera = nullptr;
+		systems.clear();
 	}
 
 private:

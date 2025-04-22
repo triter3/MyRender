@@ -76,6 +76,7 @@ private:
 
 	struct ShaderBuffer
 	{
+		uint32_t bufferType;
 		uint32_t bindingIndex;
 		std::vector<ShaderBufferVariable> variables;
 		std::optional<uint32_t> bufferLocation;
@@ -126,6 +127,33 @@ bool Shader::setUniform(const std::string& name, T& variable)
 		case GL_FLOAT_MAT4:
 			glUniformMatrix4fv(it->second.location, it->second.numElements, GL_FALSE, reinterpret_cast<const GLfloat*>(&variable));
 			break;
+		case GL_BOOL:
+			glUniform1iv(it->second.location, it->second.numElements, reinterpret_cast<const GLint*>(&variable));
+			break;
+		case GL_UNSIGNED_INT:
+			glUniform1uiv(it->second.location, it->second.numElements, reinterpret_cast<const GLuint*>(&variable));
+			break;
+		case GL_UNSIGNED_INT_VEC2:
+			glUniform2uiv(it->second.location, it->second.numElements, reinterpret_cast<const GLuint*>(&variable));
+			break;
+		case GL_UNSIGNED_INT_VEC3:
+			glUniform3uiv(it->second.location, it->second.numElements, reinterpret_cast<const GLuint*>(&variable));
+			break;
+		case GL_UNSIGNED_INT_VEC4:
+			glUniform4uiv(it->second.location, it->second.numElements, reinterpret_cast<const GLuint*>(&variable));
+			break;
+		case GL_INT:
+			glUniform1iv(it->second.location, it->second.numElements, reinterpret_cast<const GLint*>(&variable));
+			break;
+		case GL_INT_VEC2:
+			glUniform2iv(it->second.location, it->second.numElements, reinterpret_cast<const GLint*>(&variable));
+			break;
+		case GL_INT_VEC3:
+			glUniform3iv(it->second.location, it->second.numElements, reinterpret_cast<const GLint*>(&variable));
+			break;
+		case GL_INT_VEC4:
+			glUniform4iv(it->second.location, it->second.numElements, reinterpret_cast<const GLint*>(&variable));
+			break;
 		default:
 			std::cout << "Error: Uniform type not supported." << std::endl;
 			break;
@@ -145,10 +173,10 @@ bool Shader::setBufferData(const std::string& name, std::vector<T>& array)
 	uint32_t& ssboLoc = it->second.bufferLocation.value();
 
 	glGenBuffers(1, &ssboLoc);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboLoc);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, it->second.bindingIndex, ssboLoc);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	glBindBuffer(it->second.bufferType, ssboLoc);
+	glBufferData(it->second.bufferType, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
+	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
+	glBindBuffer(it->second.bufferType, 0);
 
 	std::cout << it->second.bindingIndex << std::endl;
 	std::cout << "Done" << std::endl;

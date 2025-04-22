@@ -1,4 +1,5 @@
 #include "MyRender/Camera.h"
+#include "MyRender/Window.h"
 #include <imgui.h>
 
 namespace myrender
@@ -6,6 +7,7 @@ namespace myrender
 
 void Camera::start()
 {
+    resize(Window::getCurrentWindow().getWindowSize());
     recalculateProjectionMatrix();
     recalculateViewMatrix();
 }
