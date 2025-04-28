@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <iostream>
 #include <string>
 #include <map>
 #include "MyRender/shaders/ShaderProgram.h"
@@ -177,9 +178,6 @@ bool Shader::setBufferData(const std::string& name, std::vector<T>& array)
 	glBufferData(it->second.bufferType, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
 	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
 	glBindBuffer(it->second.bufferType, 0);
-
-	std::cout << it->second.bindingIndex << std::endl;
-	std::cout << "Done" << std::endl;
 	return true;
 }
 }
