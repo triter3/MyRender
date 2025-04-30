@@ -46,6 +46,12 @@ public:
 
 	template<typename T>
 	bool setBufferData(const std::string& name, std::vector<T>& buffer);
+	bool setBufferSize(const std::string& name, uint32_t sizeInBytes);
+	template<typename T>
+	bool getBufferData(const std::string& name, std::vector<T>& buffer, uint32_t startIndex);
+	template<typename T>
+	bool getBufferDataByteOffset(const std::string& name, std::vector<T>& buffer, size_t byteOffset);
+	size_t getBufferSize(const std::string& name);
 	
 	void bind(Camera* camera, glm::mat4x4* modelMatrix);
 
@@ -170,15 +176,46 @@ bool Shader::setBufferData(const std::string& name, std::vector<T>& array)
 	auto it = mBuffersInfo.find(name);
 	if(it == mBuffersInfo.end()) return false;
 
-	it->second.bufferLocation = std::optional<uint32_t>(0);
-	uint32_t& ssboLoc = it->second.bufferLocation.value();
+	if(!it->second.bufferLocation) // Create buffer if not exists
+	{
+		it->second.bufferLocation = std::optional<uint32_t>(0);
+		uint32_t& ssboLocD = it->second.bufferLocation.value();
+		glGenBuffers(1, &ssboLocD);
+	}
 
-	glGenBuffers(1, &ssboLoc);
+	const uint32_t ssboLoc = it->second.bufferLocation.value();
+	std::cout << "Code " << ssboLoc << std::endl;
 	glBindBuffer(it->second.bufferType, ssboLoc);
+	GLenum err;
+	while((err = glGetError()) != GL_NO_ERROR)
+	{
+		std::cout << "Error Sub" << err << std::endl;
+	}
 	glBufferData(it->second.bufferType, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
 	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
 	glBindBuffer(it->second.bufferType, 0);
 	return true;
+}
+
+template<typename T>
+bool Shader::getBufferData(const std::string& name, std::vector<T>& buffer, uint32_t startIndex)
+{
+	return getBufferDataByteOffset(name, buffer, static_cast<size_t>(startIndex * sizeof(T)));
+}
+
+template<typename T>
+bool Shader::getBufferDataByteOffset(const std::string& name, std::vector<T>& buffer, size_t byteOffset)
+{
+	size_t buffSize = getBufferSize(name);
+
+	mProgram->use();
+	auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end() || !it->second.bufferLocation) return 0;
+
+	const uint32_t ssboLoc = it->second.bufferLocation.value();
+	buffSize = std::min(buffSize, buffer.size() * sizeof(T));
+	glBindBuffer(it->second.bufferType, ssboLoc);
+	glGetBufferSubData(it->second.bufferType, byteOffset, buffSize, buffer.data());
 }
 }
 
