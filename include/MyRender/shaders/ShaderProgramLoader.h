@@ -29,6 +29,7 @@ public:
 	void addSearchPath(const std::string& path) { mSearchPaths.push_back(path); }
 
 	std::shared_ptr<ShaderProgram> loadProgram(const std::string& name);
+	bool reloadProgram(const std::string& name);
 private:
 	inline static std::unique_ptr<ShaderProgramLoader> instance = nullptr;
 	std::vector<std::string> mSearchPaths;

@@ -118,32 +118,33 @@ bool Shader::load(const std::string& shaderName)
 
     // Load all SSBOs
     GLint numBuffers = 0;
-    glGetProgramInterfaceiv(pId, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &numBuffers);
-    for(uint32_t bufferType : {GL_SHADER_STORAGE_BLOCK, GL_UNIFORM_BUFFER})
+    // for(uint32_t bufferType : {GL_SHADER_STORAGE_BLOCK, GL_UNIFORM_BUFFER})
+    for(std::pair<GLenum, GLenum> bufferType : {std::make_pair(GL_SHADER_STORAGE_BLOCK, GL_SHADER_STORAGE_BUFFER)})
     {
+        glGetProgramInterfaceiv(pId, bufferType.first, GL_ACTIVE_RESOURCES, &numBuffers);
         for(uint32_t bId = 0; bId < numBuffers; bId++)
         {
             ShaderBuffer sb;
-            sb.bufferType = bufferType;
+            sb.bufferType = bufferType.second;
             sb.bufferLocation = std::optional<uint32_t>();
 
             // Get name
             GLint nameLength = 0;
-            glGetProgramResourceName(pId, sb.bufferType, bId, 255, &nameLength, nameBuffer);
+            glGetProgramResourceName(pId, bufferType.first, bId, 255, &nameLength, nameBuffer);
             std::string bufferName(nameBuffer, nameLength);
 
             // Get binding
             const GLenum bufferBindingArray[1] = {GL_BUFFER_BINDING};
-            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, bufferBindingArray, 1, NULL, reinterpret_cast<GLint*>(&sb.bindingIndex));
+            glGetProgramResourceiv(pId, bufferType.first, bId, 1, bufferBindingArray, 1, NULL, reinterpret_cast<GLint*>(&sb.bindingIndex));
 
             // Iterate buffer variables
             GLint numActiveBuffers = 0;
             const GLenum numActiveBufferArray[1] = {GL_NUM_ACTIVE_VARIABLES};
-            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, numActiveBufferArray, 1, NULL, &numActiveBuffers);
+            glGetProgramResourceiv(pId, bufferType.first, bId, 1, numActiveBufferArray, 1, NULL, &numActiveBuffers);
 
             const GLenum activeBufferArray[1] = {GL_ACTIVE_VARIABLES};
             std::vector<GLint> blockVarId(numActiveBuffers);
-            glGetProgramResourceiv(pId, sb.bufferType, bId, 1, activeBufferArray, numActiveBuffers, NULL, &blockVarId[0]);
+            glGetProgramResourceiv(pId, bufferType.first, bId, 1, activeBufferArray, numActiveBuffers, NULL, &blockVarId[0]);
             sb.variables.resize(numActiveBuffers);
             for(uint32_t i=0; i < numActiveBuffers; i++)
             {
@@ -185,6 +186,50 @@ void Shader::bind(Camera* camera, glm::mat4x4* modelMatrix)
 
     // Iterate all uniforms, textures, and images. For setting the value
     // TODO
+}
+
+bool Shader::setBufferSize(const std::string& name, uint32_t sizeInBytes)
+{
+    mProgram->use();
+	auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end()) return false;
+
+	if(!it->second.bufferLocation) // Create buffer if not exists
+	{
+		it->second.bufferLocation = std::optional<uint32_t>(0);
+		uint32_t& ssboLocD = it->second.bufferLocation.value();
+		glGenBuffers(1, &ssboLocD);
+	}
+
+	const uint32_t ssboLoc = it->second.bufferLocation.value();
+	glBindBuffer(it->second.bufferType, ssboLoc);
+	glBufferData(it->second.bufferType, sizeInBytes, NULL, GL_STATIC_DRAW);
+	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
+	glBindBuffer(it->second.bufferType, 0);
+	return true;
+}
+
+size_t Shader::getBufferSize(const std::string& name)
+{
+    mProgram->use();
+	auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end() || !it->second.bufferLocation) return 0;
+
+    const uint32_t ssboLoc = it->second.bufferLocation.value();
+	glBindBuffer(it->second.bufferType, ssboLoc);
+    int64_t size = 20;
+    glGetBufferParameteri64v(it->second.bufferType, GL_BUFFER_SIZE, &size);
+    // glMemoryBarrier(GL_SHADER_STORAGE_BUFFER);
+    glFinish();
+    std::cout << size << std::endl;
+
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+        std::cout << "Error " << err << std::endl;
+    }
+
+    return static_cast<size_t>(size);
 }
 
 }
