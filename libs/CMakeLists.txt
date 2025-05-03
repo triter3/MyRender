@@ -36,7 +36,7 @@ target_include_directories(glad PUBLIC glad/include)
 # imgui
 FetchContent_Declare(imgui_lib
 	GIT_REPOSITORY https://github.com/ocornut/imgui.git
-	GIT_TAG c71a50deb5ddf1ea386b91e60fa2e4a26d080074 # 1.87
+	GIT_TAG docking
 )
 
 FetchContent_GetProperties(imgui_lib)
@@ -60,7 +60,7 @@ endif()
 # imguizmo
 FetchContent_Declare(imguizmo_lib
 	GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
-	GIT_TAG 664cf2d73864a36b2a8b5091d33fc4578c885eca # 1.83
+	GIT_TAG master
 )
 
 FetchContent_GetProperties(imguizmo_lib)
