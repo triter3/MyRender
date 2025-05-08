@@ -35,7 +35,10 @@ void Scene::draw()
 
 void Scene::resize(glm::ivec2 windowSize)
 {
-    if(mainCamera != nullptr) mainCamera->resize(windowSize);
+    for(auto& s : systems)
+    {
+        s->resize(windowSize);
+    }
 }
 
 }

@@ -20,6 +20,7 @@ public:
 
     virtual void start() {};
     virtual void update(float deltaTime) {};
+    virtual void resize(glm::ivec2 windowSize) {};
 	virtual void draw(Camera* camera) {};
 	virtual void drawGui() {};
 private:

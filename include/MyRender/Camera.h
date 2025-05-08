@@ -33,7 +33,7 @@ public:
     const glm::mat4x4& getViewMatrix() const { return mViewMatrix; }
     const glm::mat4x4& getInverseViewMatrix() const { return mInverseViewMatrix; }
     
-    void resize(glm::ivec2 windowSize);
+    virtual void resize(glm::ivec2 windowSize);
     void drawGui() override;
 
 protected:
