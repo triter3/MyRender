@@ -2,6 +2,7 @@
 #define SYSTEM_H
 
 #include <string>
+#include <glm/glm.hpp>
 
 namespace myrender
 {
