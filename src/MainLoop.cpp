@@ -1,5 +1,6 @@
 #include "MyRender/MainLoop.h"
 
+#include <iostream>
 #include <thread>
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -62,6 +63,26 @@ void MainLoop::start(Scene& scene)
 		int aux = fpsTimer.getElapsedMilliseconds();
 		if (millisecondsPerFrame > aux) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(millisecondsPerFrame - aux));
+		}
+
+		if(mAllowFPStest && window.isKeyPressed(GLFW_KEY_F1)) // Do a frame rate test
+		{
+			Timer timer;
+			double millisPerFrame = 0.0;
+			constexpr uint32_t numTries = 20;
+			constexpr uint32_t numItrs = 1000;
+			for(uint32_t j=0; j < numTries; j++)
+			{
+				timer.start();
+				for(uint32_t i=0; i < numItrs; i++)
+				{
+					scene.draw();
+					window.swapBuffers();
+				}
+				glFinish();
+				millisPerFrame += static_cast<double>(timer.getElapsedMilliseconds()) / static_cast<double>(numItrs * numTries);
+			}
+			std::cout << "Ms per frame: " << millisPerFrame << std::endl;
 		}
 	}
 

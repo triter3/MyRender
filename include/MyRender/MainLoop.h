@@ -14,6 +14,7 @@ public:
 	void setFpsTarget(int fps) { mFpsTarget = fps; }
 private:
 	int mFpsTarget = 60;
+	static constexpr bool mAllowFPStest = false;
 };
 
 }
