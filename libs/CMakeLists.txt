@@ -47,9 +47,11 @@ if(NOT imgui_lib_POPULATED)
 	add_library(imgui STATIC ${imgui_SOURCE_FILES} 
 							${imgui_lib_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
 							${imgui_lib_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+							${imgui_lib_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 							${imgui_HEADER_FILES}
 							${imgui_lib_SOURCE_DIR}/backends/imgui_impl_glfw.h
-							${imgui_lib_SOURCE_DIR}/backends/imgui_impl_opengl3.h)
+							${imgui_lib_SOURCE_DIR}/backends/imgui_impl_opengl3.h
+							${imgui_lib_SOURCE_DIR}/misc/cpp/imgui_stdlib.h)
 	
 	target_include_directories(imgui PUBLIC ${imgui_lib_SOURCE_DIR}
 									PUBLIC ${imgui_lib_SOURCE_DIR}/backends)
