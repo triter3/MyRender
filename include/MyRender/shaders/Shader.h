@@ -78,7 +78,7 @@ public:
 	template<typename T>
 	bool getBufferDataByteOffset(const std::string& name, std::vector<T>& buffer, size_t byteOffset);
 	size_t getBufferSize(const std::string& name);
-	void setBuffer(const std::string& name, std::shared_ptr<Buffer> buffer);
+	bool setBuffer(const std::string& name, std::shared_ptr<Buffer> buffer);
 	std::shared_ptr<Buffer> getBuffer(const std::string& name);
 	
 	void bind(Camera* camera, glm::mat4x4* modelMatrix);
