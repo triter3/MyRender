@@ -126,7 +126,7 @@ bool Shader::load(const std::string& shaderName)
         {
             ShaderBuffer sb;
             sb.bufferType = bufferType.second;
-            sb.bufferLocation = std::optional<uint32_t>();
+            sb.buffer = nullptr;
 
             // Get name
             GLint nameLength = 0;
@@ -194,34 +194,40 @@ bool Shader::setBufferSize(const std::string& name, uint32_t sizeInBytes)
 	auto it = mBuffersInfo.find(name);
 	if(it == mBuffersInfo.end()) return false;
 
-	if(!it->second.bufferLocation) // Create buffer if not exists
+	if(it->second.buffer == nullptr) // Create buffer if not exists
 	{
-		it->second.bufferLocation = std::optional<uint32_t>(0);
-		uint32_t& ssboLocD = it->second.bufferLocation.value();
-		glGenBuffers(1, &ssboLocD);
+		it->second.buffer = std::make_shared<Buffer>(it->second.bufferType);
 	}
 
-	const uint32_t ssboLoc = it->second.bufferLocation.value();
-	glBindBuffer(it->second.bufferType, ssboLoc);
-	glBufferData(it->second.bufferType, sizeInBytes, NULL, GL_STATIC_DRAW);
+	it->second.buffer->resize(sizeInBytes);
+	const uint32_t ssboLoc = it->second.buffer->getId();
 	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
 	glBindBuffer(it->second.bufferType, 0);
 	return true;
+}
+
+void Shader::Buffer::resize(uint32_t sizeInBytes)
+{
+    const uint32_t ssboLoc = mLocId;
+	glBindBuffer(mBufferType, ssboLoc);
+	glBufferData(mBufferType, sizeInBytes, NULL, GL_STATIC_DRAW);
 }
 
 size_t Shader::getBufferSize(const std::string& name)
 {
     mProgram->use();
 	auto it = mBuffersInfo.find(name);
-	if(it == mBuffersInfo.end() || !it->second.bufferLocation) return 0;
+	if(it == mBuffersInfo.end() || it->second.buffer == nullptr) return 0;
+    return it->second.buffer->getSize();
+}
 
-    const uint32_t ssboLoc = it->second.bufferLocation.value();
-	glBindBuffer(it->second.bufferType, ssboLoc);
-    int64_t size = 20;
-    glGetBufferParameteri64v(it->second.bufferType, GL_BUFFER_SIZE, &size);
-    // glMemoryBarrier(GL_SHADER_STORAGE_BUFFER);
+size_t Shader::Buffer::getSize()
+{
+    const uint32_t ssboLoc = mLocId;
+	glBindBuffer(mBufferType, ssboLoc);
+    int64_t size = 0;
+    glGetBufferParameteri64v(mBufferType, GL_BUFFER_SIZE, &size);
     glFinish();
-    std::cout << size << std::endl;
 
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)
@@ -230,6 +236,20 @@ size_t Shader::getBufferSize(const std::string& name)
     }
 
     return static_cast<size_t>(size);
+}
+
+void Shader::setBuffer(const std::string& name, std::shared_ptr<Shader::Buffer> buffer)
+{
+    auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end()) return;
+    it->second.buffer = std::move(buffer);
+}
+
+std::shared_ptr<Shader::Buffer> Shader::getBuffer(const std::string& name)
+{
+    auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end()) return nullptr;
+    else return it->second.buffer;
 }
 
 }
