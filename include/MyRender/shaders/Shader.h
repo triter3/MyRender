@@ -240,15 +240,15 @@ bool Shader::getBufferDataByteOffset(const std::string& name, std::vector<T>& bu
 {
 	auto it = mBuffersInfo.find(name);
 	if(it == mBuffersInfo.end() || it->second.buffer == nullptr) return false;
-
-	return it->second.buffer->getData(buffer, byteOffset);
+	it->second.buffer->getData(buffer, byteOffset);
+	return true;
 }
 
 template<typename T>
 void Shader::Buffer::getData(std::vector<T>& buffer, size_t byteOffset)
 {
 	size_t buffSize = getSize();
-	const uint32_t ssboLoc = it->second.bufferLocation.value();
+	const uint32_t ssboLoc = mLocId;
 	buffSize = std::min(buffSize, buffer.size() * sizeof(T));
 	glBindBuffer(mBufferType, ssboLoc);
 	glGetBufferSubData(mBufferType, byteOffset, buffSize, buffer.data());
