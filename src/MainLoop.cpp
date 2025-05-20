@@ -65,12 +65,13 @@ void MainLoop::start(Scene& scene)
 			std::this_thread::sleep_for(std::chrono::milliseconds(millisecondsPerFrame - aux));
 		}
 
-		if(mAllowFPStest && window.isKeyPressed(GLFW_KEY_F1)) // Do a frame rate test
+		if(mAllowFPStest && mDoFPStest) // Do a frame rate test
 		{
+			std::cout << "Start test" << std::endl;
 			Timer timer;
 			double millisPerFrame = 0.0;
-			constexpr uint32_t numTries = 20;
-			constexpr uint32_t numItrs = 1000;
+			constexpr uint32_t numTries = 10;
+			constexpr uint32_t numItrs = 300;
 			for(uint32_t j=0; j < numTries; j++)
 			{
 				timer.start();
@@ -83,6 +84,9 @@ void MainLoop::start(Scene& scene)
 				millisPerFrame += static_cast<double>(timer.getElapsedMilliseconds()) / static_cast<double>(numItrs * numTries);
 			}
 			std::cout << "Ms per frame: " << millisPerFrame << std::endl;
+			if(mFPStestCallback) mFPStestCallback.value()(millisPerFrame);
+			mFPStestCallback = std::nullopt;
+			mDoFPStest = false;
 		}
 	}
 
