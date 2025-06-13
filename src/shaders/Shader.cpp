@@ -241,7 +241,7 @@ size_t Shader::Buffer::getSize()
 bool Shader::setBuffer(const std::string& name, std::shared_ptr<Shader::Buffer> buffer)
 {
     auto it = mBuffersInfo.find(name);
-	if(it == mBuffersInfo.end() || buffer->getType() != it->second.bufferType) return false;
+	if(it == mBuffersInfo.end() || (buffer != nullptr && buffer->getType() != it->second.bufferType)) return false;
     it->second.buffer = std::move(buffer);
     return true;
 }
