@@ -2,6 +2,8 @@
 #define MAIN_LOOP_H
 
 #include "MyRender/Scene.h"
+#include <optional>
+#include <functional>
 
 namespace myrender
 {
