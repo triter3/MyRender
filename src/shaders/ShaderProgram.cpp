@@ -100,6 +100,17 @@ ShaderProgram::ShaderProgram(const std::string& shaderName)
 
 	glLinkProgram(mProgramId);
 
+	int success;
+	glGetProgramiv(mProgramId, GL_LINK_STATUS, &success);
+	if(!success)
+	{
+		char infoLog[512];
+		glGetProgramInfoLog(mProgramId, 512, NULL, infoLog);
+		std::cout << "-> Link error ( " << shaderName << " ):" << std::endl;
+		std::cout << infoLog << std::endl;
+		return;
+	}
+
 	for(auto iShader : inputShaders)
 	{
 		glDeleteShader(std::get<2>(iShader));
