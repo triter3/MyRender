@@ -82,6 +82,8 @@ bool Shader::load(const std::string& shaderName)
     char nameBuffer[256];
 
     // Load all uniforms
+    std::vector<std::pair<uint32_t, std::string>> atomicCounters;
+
     GLint numUniforms = 0;
     glGetProgramInterfaceiv(pId, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
 
@@ -91,6 +93,12 @@ bool Shader::load(const std::string& shaderName)
         glGetActiveUniform(pId, sId, 256, &nameLength, &numElem, &type, nameBuffer);
         std::string uniformName(nameBuffer, nameLength);
 
+        if(type == GL_UNSIGNED_INT_ATOMIC_COUNTER) // Special treatment for atomic counters
+        {
+            uint32_t bId = glGetProgramResourceIndex(pId, GL_UNIFORM, uniformName.c_str());
+            atomicCounters.push_back(std::pair(bId, uniformName));
+            continue;
+        }
         auto uniTypeIt = internal::uniformTypes.find(type);
         auto samplerTypeIt = internal::samplerTypes.find(type);
         auto imgTypeIt = internal::imageTypes.find(type);
@@ -116,10 +124,13 @@ bool Shader::load(const std::string& shaderName)
         }
     }
 
+    std::sort(atomicCounters.begin(), atomicCounters.end(), [](const auto& v1, const auto& v2) { return v1.first < v2.first; });
+    uint32_t nextAtomicCounterIdx = 0;
+
     // Load all SSBOs
     GLint numBuffers = 0;
     // for(uint32_t bufferType : {GL_SHADER_STORAGE_BLOCK, GL_UNIFORM_BUFFER})
-    for(std::pair<GLenum, GLenum> bufferType : {std::make_pair(GL_SHADER_STORAGE_BLOCK, GL_SHADER_STORAGE_BUFFER)})
+    for(std::pair<GLenum, GLenum> bufferType : {std::make_pair(GL_SHADER_STORAGE_BLOCK, GL_SHADER_STORAGE_BUFFER), std::make_pair(GL_ATOMIC_COUNTER_BUFFER, GL_ATOMIC_COUNTER_BUFFER)})
     {
         glGetProgramInterfaceiv(pId, bufferType.first, GL_ACTIVE_RESOURCES, &numBuffers);
         for(uint32_t bId = 0; bId < numBuffers; bId++)
@@ -129,9 +140,17 @@ bool Shader::load(const std::string& shaderName)
             sb.buffer = nullptr;
 
             // Get name
-            GLint nameLength = 0;
-            glGetProgramResourceName(pId, bufferType.first, bId, 255, &nameLength, nameBuffer);
-            std::string bufferName(nameBuffer, nameLength);
+            std::string bufferName;
+            if(bufferType.first == GL_ATOMIC_COUNTER_BUFFER)
+            {
+                bufferName = atomicCounters[nextAtomicCounterIdx++].second;
+            }
+            else
+            {
+                GLint nameLength = 0;
+                glGetProgramResourceName(pId, bufferType.first, bId, 255, &nameLength, nameBuffer);
+                bufferName = std::string(nameBuffer, nameLength);
+            }
 
             // Get binding
             const GLenum bufferBindingArray[1] = {GL_BUFFER_BINDING};
@@ -174,16 +193,24 @@ void Shader::bind(Camera* camera, glm::mat4x4* modelMatrix)
     }
 
     // Set basic camera matrices
-    setUniform("modelMatrix", res);
-    setUniform("normalModelMatrix", glm::inverseTranspose(glm::mat3(res)));
-    setUniform("viewMatrix", camera->getViewMatrix());
-    res = camera->getViewMatrix() * res;
-    setUniform("viewModelMatrix", res);
-    setUniform("normalViewModelMatrix", glm::inverseTranspose(glm::mat3(res)));
-    setUniform("projectionMatrix", camera->getProjectionMatrix());
-    res = camera->getProjectionMatrix() * res;
-    setUniform("projectionViewModelMatrix", res);
+    if(camera != nullptr)
+    {
+        setUniform("modelMatrix", res);
+        setUniform("normalModelMatrix", glm::inverseTranspose(glm::mat3(res)));
+        setUniform("viewMatrix", camera->getViewMatrix());
+        res = camera->getViewMatrix() * res;
+        setUniform("viewModelMatrix", res);
+        setUniform("normalViewModelMatrix", glm::inverseTranspose(glm::mat3(res)));
+        setUniform("projectionMatrix", camera->getProjectionMatrix());
+        res = camera->getProjectionMatrix() * res;
+        setUniform("projectionViewModelMatrix", res);
+    }
 
+    for(auto const& bInfo : mBuffersInfo)
+    {
+        glBindBufferBase(bInfo.second.bufferType, bInfo.second.bindingIndex, bInfo.second.buffer->getId());
+        glBindBuffer(bInfo.second.bufferType, 0);
+    }
     // Iterate all uniforms, textures, and images. For setting the value
     // TODO
 }
@@ -227,7 +254,6 @@ size_t Shader::Buffer::getSize()
 	glBindBuffer(mBufferType, ssboLoc);
     int64_t size = 0;
     glGetBufferParameteri64v(mBufferType, GL_BUFFER_SIZE, &size);
-    glFinish();
 
     GLenum err;
     while((err = glGetError()) != GL_NO_ERROR)

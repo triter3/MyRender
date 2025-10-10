@@ -48,6 +48,9 @@ public:
 			
 			template<typename T>
 			void setData(std::vector<T>& buffer);
+			inline void setData(const void* buffer, size_t bufferSize);
+			template<typename T>
+			void setSubData(std::vector<T>& buffer, size_t byteOffset);
 			void resize(uint32_t sizeInBytes);
 			template<typename T>
 			void getData(std::vector<T>& buffer, size_t byteOffset);
@@ -72,7 +75,10 @@ public:
 
 	template<typename T>
 	bool setBufferData(const std::string& name, std::vector<T>& buffer);
+	inline bool setBufferData(const std::string& name, const void* buffer, size_t bufferSize);
 	bool setBufferSize(const std::string& name, uint32_t sizeInBytes);
+	template<typename T>
+	bool setBufferSubData(const std::string& name, std::vector<T>& buffer, uint32_t startIdx);
 	template<typename T>
 	bool getBufferData(const std::string& name, std::vector<T>& buffer, uint32_t startIndex);
 	template<typename T>
@@ -216,8 +222,62 @@ bool Shader::setBufferData(const std::string& name, std::vector<T>& array)
 	return true;
 }
 
+bool Shader::setBufferData(const std::string& name, const void* buffer, size_t bufferSize)
+{
+	mProgram->use();
+	auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end()) return false;
+
+	if(it->second.buffer == nullptr) // Create buffer if not exists
+	{
+		it->second.buffer = std::make_shared<Buffer>(it->second.bufferType);
+	}
+
+	it->second.buffer->setData(buffer, bufferSize);
+	const uint32_t ssboLoc = it->second.buffer->getId();
+	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
+	glBindBuffer(it->second.bufferType, 0);
+	return true;
+}
+
+template<typename T>
+bool Shader::setBufferSubData(const std::string& name, std::vector<T>& buffer, uint32_t startIdx)
+{
+	mProgram->use();
+	auto it = mBuffersInfo.find(name);
+	if(it == mBuffersInfo.end()) return false;
+
+	if(it->second.buffer == nullptr) // Create buffer if not exists
+	{
+		it->second.buffer = std::make_shared<Buffer>(it->second.bufferType);
+		it->second.buffer->resize((startIdx + buffer.size()) * sizeof(T));
+	}
+
+	it->second.buffer->setSubData(buffer, startIdx * sizeof(T));
+	
+	const uint32_t ssboLoc = it->second.buffer->getId();
+	glBindBufferBase(it->second.bufferType, it->second.bindingIndex, ssboLoc);
+	glBindBuffer(it->second.bufferType, 0);
+	return true;
+}
+
 template<typename T>
 void Shader::Buffer::setData(std::vector<T>& array)
+{
+	const uint32_t ssboLoc = mLocId;
+	glBindBuffer(mBufferType, ssboLoc);
+	glBufferData(mBufferType, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
+}
+
+void Shader::Buffer::setData(const void* buffer, size_t bufferSize)
+{
+	const uint32_t ssboLoc = mLocId;
+	glBindBuffer(mBufferType, ssboLoc);
+	glBufferData(mBufferType, bufferSize, buffer, GL_STATIC_DRAW);
+}
+
+template<typename T>
+void Shader::Buffer::setSubData(std::vector<T>& buffer, size_t byteOffset)
 {
 	const uint32_t ssboLoc = mLocId;
 	glBindBuffer(mBufferType, ssboLoc);
@@ -226,7 +286,7 @@ void Shader::Buffer::setData(std::vector<T>& array)
 	{
 		std::cout << "Error Sub" << err << std::endl;
 	}
-	glBufferData(mBufferType, array.size() * sizeof(T), reinterpret_cast<const void*>(array.data()), GL_STATIC_DRAW);
+	glBufferSubData(mBufferType, byteOffset, buffer.size() * sizeof(T), reinterpret_cast<const void*>(buffer.data()));
 }
 
 template<typename T>
@@ -251,6 +311,11 @@ void Shader::Buffer::getData(std::vector<T>& buffer, size_t byteOffset)
 	const uint32_t ssboLoc = mLocId;
 	buffSize = std::min(buffSize, buffer.size() * sizeof(T));
 	glBindBuffer(mBufferType, ssboLoc);
+	GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+        std::cout << "Error " << err << std::endl;
+    }
 	glGetBufferSubData(mBufferType, byteOffset, buffSize, buffer.data());
 }
 }

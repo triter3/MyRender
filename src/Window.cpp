@@ -34,7 +34,7 @@ bool Window::start() {
 
 	// Start a glfw window
 	mGlfwWindow = glfwCreateWindow(640, 640, "SharpBox", NULL, NULL);
-	// glfwMaximizeWindow(glWindow);
+	glfwMaximizeWindow(mGlfwWindow);
 	glfwMakeContextCurrent(mGlfwWindow);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 
