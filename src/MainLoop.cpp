@@ -50,8 +50,9 @@ void MainLoop::start(Scene& scene)
 		ImGuizmo::BeginFrame();
 
 		// Scene update
-		scene.update(deltaTimer.getElapsedSeconds());
+		float dt = deltaTimer.getElapsedSeconds();
 		deltaTimer.start();
+		scene.update(deltaTimer.getElapsedSeconds());
 
 		// Scene draw
 		scene.draw();
