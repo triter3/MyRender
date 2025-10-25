@@ -20,6 +20,12 @@ public:
 		mFPStestCallback = call;
 	}
 
+	void requestImageCapture(const std::string& imagePath, uint32_t imageHeight)
+	{
+		mImageCapturePath = imagePath;
+		mCaptureImageHeight = imageHeight;
+	}
+
 	static MainLoop* getCurrent() { return mCurrentLoop; }
 private:
 	static MainLoop* mCurrentLoop;
@@ -27,6 +33,8 @@ private:
 	static constexpr bool mAllowFPStest = true;
 	bool mDoFPStest = false;
 	std::optional<std::function<void(double)>> mFPStestCallback;
+	std::optional<std::string> mImageCapturePath;
+	uint32_t mCaptureImageHeight = 1;
 };
 
 }
