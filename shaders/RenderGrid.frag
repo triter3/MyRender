@@ -1,6 +1,6 @@
-#version 330 core
+#version 460 core
 
-uniform vec4 color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+uniform vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 out vec4 fragColor;  
 

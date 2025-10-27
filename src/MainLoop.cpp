@@ -11,7 +11,6 @@
 
 namespace myrender
 {
-
 MainLoop* MainLoop::mCurrentLoop = nullptr;
 
 void MainLoop::start(Scene& scene)
@@ -52,7 +51,7 @@ void MainLoop::start(Scene& scene)
 		// Scene update
 		float dt = deltaTimer.getElapsedSeconds();
 		deltaTimer.start();
-		scene.update(deltaTimer.getElapsedSeconds());
+		scene.update(dt);
 
 		// Scene draw
 		scene.draw();
