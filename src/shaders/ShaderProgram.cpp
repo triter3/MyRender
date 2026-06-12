@@ -124,6 +124,7 @@ std::optional<std::filesystem::path> ShaderProgram::getModulePath(const std::str
 	std::function<std::optional<std::filesystem::path>(const std::filesystem::path&)> searchModule;
 	searchModule = [&](const std::filesystem::path& path) -> std::optional<std::filesystem::path>
 	{
+		if(!std::filesystem::exists(path)) return std::nullopt;
 		auto pitr = std::filesystem::directory_iterator(path);
 		for(std::filesystem::directory_entry entry : pitr)
 		{
