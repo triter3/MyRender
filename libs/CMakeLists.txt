@@ -62,14 +62,14 @@ endif()
 # imguizmo
 FetchContent_Declare(imguizmo_lib
 	GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
-	GIT_TAG master
+	GIT_TAG b796ac3b861afc6e91ca74e4611effd9c9527367
 )
 
 FetchContent_GetProperties(imguizmo_lib)
 if(NOT imguizmo_lib_POPULATED)
 	FetchContent_Populate(imguizmo_lib)
-	file(GLOB imguizmo_SOURCE_FILES ${imguizmo_lib_SOURCE_DIR}/*.cpp)
-	file(GLOB imguizmo_HEADER_FILES ${imguizmo_lib_SOURCE_DIR}/*.h)
+	file(GLOB imguizmo_SOURCE_FILES ${imguizmo_lib_SOURCE_DIR}/src/*.cpp)
+	file(GLOB imguizmo_HEADER_FILES ${imguizmo_lib_SOURCE_DIR}/src/*.h)
 	add_library(imguizmo STATIC ${imguizmo_SOURCE_FILES} 
 							${imguizmo_HEADER_FILES})
 	
