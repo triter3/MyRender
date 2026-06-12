@@ -73,7 +73,7 @@ if(NOT imguizmo_lib_POPULATED)
 	add_library(imguizmo STATIC ${imguizmo_SOURCE_FILES} 
 							${imguizmo_HEADER_FILES})
 	
-	target_include_directories(imguizmo PUBLIC ${imguizmo_lib_SOURCE_DIR})
+	target_include_directories(imguizmo PUBLIC ${imguizmo_lib_SOURCE_DIR}/src)
 	target_link_libraries(imguizmo  PRIVATE glfw
 									PRIVATE glad
 									PRIVATE imgui)
