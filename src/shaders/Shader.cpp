@@ -208,6 +208,7 @@ void Shader::bind(Camera* camera, glm::mat4x4* modelMatrix)
 
     for(auto const& bInfo : mBuffersInfo)
     {
+        if(bInfo.second.buffer == nullptr) continue;
         glBindBufferBase(bInfo.second.bufferType, bInfo.second.bindingIndex, bInfo.second.buffer->getId());
         glBindBuffer(bInfo.second.bufferType, 0);
     }
