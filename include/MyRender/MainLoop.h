@@ -27,6 +27,11 @@ public:
 	}
 
 	static MainLoop* getCurrent() { return mCurrentLoop; }
+
+	bool doingCapture()
+	{
+		return mDoCapture;
+	}
 private:
 	static MainLoop* mCurrentLoop;
 	int mFpsTarget = 60;
@@ -35,6 +40,7 @@ private:
 	std::optional<std::function<void(double)>> mFPStestCallback;
 	std::optional<std::string> mImageCapturePath;
 	uint32_t mCaptureImageHeight = 1;
+	bool mDoCapture = false;
 };
 
 }

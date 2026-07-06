@@ -45,6 +45,7 @@ void MainLoop::start(Scene& scene)
 		glm::ivec2 captureSize;
 		float captureScale;
 		bool doCapture = false;
+		mDoCapture = false;
 		uint32_t captureFboId = 0;
 		uint32_t captureRboId;
 		uint32_t captureTextureId;
@@ -75,6 +76,7 @@ void MainLoop::start(Scene& scene)
 			glBindTexture(GL_TEXTURE_2D, 0);
         	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 			doCapture = true;
+			mDoCapture = true;
 		} 
 		else if(window.needResize())
 		{
