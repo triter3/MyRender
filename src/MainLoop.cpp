@@ -13,7 +13,6 @@
 
 namespace myrender
 {
-
 MainLoop* MainLoop::mCurrentLoop = nullptr;
 
 void MainLoop::start(Scene& scene)
